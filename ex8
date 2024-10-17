@@ -1,7 +1,5 @@
-#  Instead of using the library from grade 2, use
-#  a TCP socket for connection, send an HTTP
-# formatted request, select the HTTP response
-#  body, and pass it further to the scraping logic.
+#  Create your custom serialization technique that
+#  can serialize and deserialize data.[4]
 
 import socket
 import ssl
@@ -12,7 +10,6 @@ from datetime import datetime, timezone
 # Target server and port
 host = '999.md'
 port = 443  # HTTPS uses port 443
-base_url = f"https://{host}"  # Base URL for relative links
 
 # HTTP request template (GET request for a specific page)
 request = f"GET /ro/list/computers-and-office-equipment/tablet HTTP/1.1\r\nHost: {host}\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0.0 Safari/537.36\r\nConnection: close\r\n\r\n"
@@ -22,12 +19,8 @@ context = ssl.create_default_context()
 
 # Create a socket and connect to the server
 with socket.create_connection((host, port)) as sock:
-    # Wrap the socket with the SSL context
     with context.wrap_socket(sock, server_hostname=host) as ssl_sock:
-        # Send the HTTP request
         ssl_sock.sendall(request.encode())
-
-        # Receive the response data in chunks
         response_data = b""
         while True:
             chunk = ssl_sock.recv(4096)
@@ -41,13 +34,12 @@ response_text = response_data.decode()
 # Find the start of the HTTP body (after headers)
 header_end_idx = response_text.find("\r\n\r\n")
 if header_end_idx != -1:
-    html_body = response_text[header_end_idx + 4:]  # The actual HTML content
+    html_body = response_text[header_end_idx + 4:]
 
 # Pass the HTML body to BeautifulSoup for scraping
 soup = BeautifulSoup(html_body, 'html.parser')
 
 def scrape_product_details(product_link):
-    # Use socket connection to fetch product details instead of requests
     with socket.create_connection((host, port)) as sock:
         with context.wrap_socket(sock, server_hostname=host) as ssl_sock:
             request = f"GET {product_link} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0.0 Safari/537.36\r\nConnection: close\r\n\r\n"
@@ -60,26 +52,17 @@ def scrape_product_details(product_link):
                     break
                 product_response_data += chunk
 
-    # Decode the response
     product_response_text = product_response_data.decode()
-
-    # Find the start of the HTTP body (after headers)
     header_end_idx = product_response_text.find("\r\n\r\n")
     if header_end_idx != -1:
-        product_html_body = product_response_text[header_end_idx + 4:]  # The actual HTML content
+        product_html_body = product_response_text[header_end_idx + 4:]
     else:
         return "Descriere indisponibilă"
 
     product_soup = BeautifulSoup(product_html_body, 'html.parser')
-
     description_tag = product_soup.find('div', class_='adPage__content__description grid_18', itemprop='description')
 
-    if description_tag:
-        description = description_tag.get_text(strip=True)
-    else:
-        description = "Descriere indisponibilă"
-
-    return description
+    return description_tag.get_text(strip=True) if description_tag else "Descriere indisponibilă"
 
 def convert_to_eur(price_mdl):
     conversion_rate = 20
@@ -93,7 +76,7 @@ products = soup.find_all('li', class_='ads-list-photo-item')
 
 product_data = []
 for index, product in enumerate(products):
-    if index >= 10:
+    if index >= 20:
         break
 
     name_tag = product.find('div', class_='ads-list-photo-item-title')
@@ -111,22 +94,19 @@ for index, product in enumerate(products):
             price_mdl = float(price_text)
             price_eur = convert_to_eur(price_mdl)
         except ValueError:
-            print(f"Prețul '{price_text}' nu este valid.")
             continue
     elif '€' in price_text:
         price_text = price_text.replace('€', '').replace(' ', '')
         try:
-            price_eur = float(price_text)  # Convert to EUR
-            price_mdl = convert_to_mdl(price_eur)  # Convert to MDL
+            price_eur = float(price_text)
+            price_mdl = convert_to_mdl(price_eur)
         except ValueError:
-            print(f"Prețul '{price_text}' nu este valid.")
             continue
 
     link = name_tag.find('a')['href'] if name_tag and name_tag.find('a') else None
     if link:
         link = f"https://999.md{link}" if link.startswith("/") else link
     else:
-        print(f"Numele produsului: {name} nu are un link valid.")
         continue
 
     product_data.append({
@@ -140,9 +120,7 @@ for index, product in enumerate(products):
 # Filter products within a price range
 min_price = 10.00
 max_price = 200.00
-
 filtered_products = list(filter(lambda x: min_price <= x['price_eur'] <= max_price, product_data))
-
 total_price_eur = reduce(lambda acc, x: acc + x['price_eur'], filtered_products, 0.0)
 
 results = {
@@ -151,4 +129,69 @@ results = {
     'total_price_eur': total_price_eur,
 }
 
-print(results)
+# Custom Serialization
+def serialize(data):
+    if isinstance(data, dict):
+        serialized_items = []
+        for key, value in data.items():
+            serialized_items.append(f"{serialize(key)}:{serialize(value)}")
+        return f"D{{{' '.join(serialized_items)}}}"
+    
+    elif isinstance(data, list):
+        serialized_items = [serialize(item) for item in data]
+        return f"L[{' '.join(serialized_items)}]"
+    
+    elif isinstance(data, str):
+        return f"str({data})"
+    
+    elif isinstance(data, int):
+        return f"int({data})"
+    
+    elif isinstance(data, float):
+        return f"float({data})"
+    
+    else:
+        raise ValueError(f"Unsupported data type: {type(data)}")
+
+def deserialize(serialized_str):
+    def parse_value(value_str):
+        if value_str.startswith("str(") and value_str.endswith(")"):
+            return value_str[4:-1]
+        
+        elif value_str.startswith("int(") and value_str.endswith(")"):
+            return int(value_str[4:-1])
+        
+        elif value_str.startswith("float(") and value_str.endswith(")"):
+            return float(value_str[6:-1])
+        
+        elif value_str.startswith("D{"):
+            items = value_str[2:-1].split(' ')
+            result_dict = {}
+            for item in items:
+                if item:
+                    key_value = item.split(':', 1)
+                    if len(key_value) == 2:
+                        key = parse_value(key_value[0].strip())
+                        value = parse_value(key_value[1].strip())
+                        if isinstance(key, str):  # Ensure the key is a valid type
+                            result_dict[key] = value
+            return result_dict
+        
+        elif value_str.startswith("L["):
+            items = value_str[2:-1].split(' ')
+            result_list = [parse_value(item.strip()) for item in items if item]
+            return result_list
+
+    return parse_value(serialized_str)
+
+# Serialize results
+serialized_results = serialize(results)
+
+# Deserialize the results
+deserialized_results = deserialize(serialized_results)
+
+# Print outputs
+print("Serialized Results:")
+print(serialized_results)
+print("\nDeserialized Results:")
+print(deserialized_results)
