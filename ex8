@@ -7,17 +7,13 @@ from bs4 import BeautifulSoup
 from functools import reduce
 from datetime import datetime, timezone
 
-# Target server and port
 host = '999.md'
-port = 443  # HTTPS uses port 443
+port = 443
 
-# HTTP request template (GET request for a specific page)
 request = f"GET /ro/list/computers-and-office-equipment/tablet HTTP/1.1\r\nHost: {host}\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0.0 Safari/537.36\r\nConnection: close\r\n\r\n"
 
-# Create an SSL context
 context = ssl.create_default_context()
 
-# Create a socket and connect to the server
 with socket.create_connection((host, port)) as sock:
     with context.wrap_socket(sock, server_hostname=host) as ssl_sock:
         ssl_sock.sendall(request.encode())
@@ -28,15 +24,12 @@ with socket.create_connection((host, port)) as sock:
                 break
             response_data += chunk
 
-# Decode the response to string
 response_text = response_data.decode()
 
-# Find the start of the HTTP body (after headers)
 header_end_idx = response_text.find("\r\n\r\n")
 if header_end_idx != -1:
     html_body = response_text[header_end_idx + 4:]
 
-# Pass the HTML body to BeautifulSoup for scraping
 soup = BeautifulSoup(html_body, 'html.parser')
 
 def scrape_product_details(product_link):
@@ -117,7 +110,6 @@ for index, product in enumerate(products):
         'description': scrape_product_details(link),
     })
 
-# Filter products within a price range
 min_price = 10.00
 max_price = 200.00
 filtered_products = list(filter(lambda x: min_price <= x['price_eur'] <= max_price, product_data))
@@ -129,7 +121,6 @@ results = {
     'total_price_eur': total_price_eur,
 }
 
-# Custom Serialization
 def serialize(data):
     if isinstance(data, dict):
         serialized_items = []
@@ -173,7 +164,7 @@ def deserialize(serialized_str):
                     if len(key_value) == 2:
                         key = parse_value(key_value[0].strip())
                         value = parse_value(key_value[1].strip())
-                        if isinstance(key, str):  # Ensure the key is a valid type
+                        if isinstance(key, str):
                             result_dict[key] = value
             return result_dict
         
@@ -184,13 +175,10 @@ def deserialize(serialized_str):
 
     return parse_value(serialized_str)
 
-# Serialize results
 serialized_results = serialize(results)
 
-# Deserialize the results
 deserialized_results = deserialize(serialized_results)
 
-# Print outputs
 print("Serialized Results:")
 print(serialized_results)
 print("\nDeserialized Results:")

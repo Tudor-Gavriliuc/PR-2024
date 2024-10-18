@@ -9,25 +9,18 @@ from bs4 import BeautifulSoup
 from functools import reduce
 from datetime import datetime, timezone
 
-# Target server and port
 host = '999.md'
-port = 443  # HTTPS uses port 443
-base_url = f"https://{host}"  # Base URL for relative links
+port = 443
+base_url = f"https://{host}"
 
-# HTTP request template (GET request for a specific page)
 request = f"GET /ro/list/computers-and-office-equipment/tablet HTTP/1.1\r\nHost: {host}\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0.0 Safari/537.36\r\nConnection: close\r\n\r\n"
 
-# Create an SSL context
 context = ssl.create_default_context()
 
-# Create a socket and connect to the server
 with socket.create_connection((host, port)) as sock:
-    # Wrap the socket with the SSL context
     with context.wrap_socket(sock, server_hostname=host) as ssl_sock:
-        # Send the HTTP request
         ssl_sock.sendall(request.encode())
 
-        # Receive the response data in chunks
         response_data = b""
         while True:
             chunk = ssl_sock.recv(4096)
@@ -35,19 +28,15 @@ with socket.create_connection((host, port)) as sock:
                 break
             response_data += chunk
 
-# Decode the response to string
 response_text = response_data.decode()
 
-# Find the start of the HTTP body (after headers)
 header_end_idx = response_text.find("\r\n\r\n")
 if header_end_idx != -1:
-    html_body = response_text[header_end_idx + 4:]  # The actual HTML content
+    html_body = response_text[header_end_idx + 4:]
 
-# Pass the HTML body to BeautifulSoup for scraping
 soup = BeautifulSoup(html_body, 'html.parser')
 
 def scrape_product_details(product_link):
-    # Use socket connection to fetch product details instead of requests
     with socket.create_connection((host, port)) as sock:
         with context.wrap_socket(sock, server_hostname=host) as ssl_sock:
             request = f"GET {product_link} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0.0 Safari/537.36\r\nConnection: close\r\n\r\n"
@@ -60,13 +49,11 @@ def scrape_product_details(product_link):
                     break
                 product_response_data += chunk
 
-    # Decode the response
     product_response_text = product_response_data.decode()
 
-    # Find the start of the HTTP body (after headers)
     header_end_idx = product_response_text.find("\r\n\r\n")
     if header_end_idx != -1:
-        product_html_body = product_response_text[header_end_idx + 4:]  # The actual HTML content
+        product_html_body = product_response_text[header_end_idx + 4:]
     else:
         return "Descriere indisponibilă"
 
@@ -137,7 +124,6 @@ for index, product in enumerate(products):
         'description': scrape_product_details(link),
     })
 
-# Filter products within a price range
 min_price = 10.00
 max_price = 200.00
 
