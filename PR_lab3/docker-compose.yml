@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  node-0:
+    build: .
+    container_name: node-0
+    command: ["python3", "raft_node.py", "0"]  # Pass node_id as 0
+    networks:
+      - raft_net
+  node-1:
+    build: .
+    container_name: node-1
+    command: ["python3", "raft_node.py", "1"]  # Pass node_id as 1
+    networks:
+      - raft_net
+  node-2:
+    build: .
+    container_name: node-2
+    command: ["python3", "raft_node.py", "2"]  # Pass node_id as 2
+    networks:
+      - raft_net
+  node-3:
+    build: .
+    container_name: node-3
+    command: ["python3", "raft_node.py", "3"]  # Pass node_id as 3
+    networks:
+      - raft_net
+  node-4:
+    build: .
+    container_name: node-4
+    command: ["python3", "raft_node.py", "4"]  # Pass node_id as 4
+    networks:
+      - raft_net
+
+networks:
+  raft_net:
+    driver: bridge
