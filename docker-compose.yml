@@ -1,7 +1,0 @@
-services:
-  lab1-http-server:  # Name of your container
-    image: nicug/server-pr-lab1:latest  # The Docker image to use
-    ports:
-      - "8000:8000"  # Connect the port 8004 on your computer to port 8000 in the container
-    environment:  # Set environment variables
-      - PORT=8000

@@ -50,7 +50,7 @@ if response.status_code == 200:
 
     product_data = []
     for index, product in enumerate(products):
-        if index >= 5:
+        if index >= 20:
             break
 
         name_tag = product.find('div', class_='ads-list-photo-item-title')
