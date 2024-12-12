@@ -1,0 +1,107 @@
+{
+  "cars": [
+    {
+      "name": "Ford Fusion, 2003 an",
+      "price": 77000,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/82743328",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "2902"
+    },
+    {
+      "name": "Altă marcă Alt model, 2019 an",
+      "price": 239000,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/2900766",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "135"
+    },
+    {
+      "name": "Volkswagen Tiguan, 2007 an",
+      "price": 154000,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/83634910",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "1804"
+    },
+
+    {
+      "name": "Peugeot 3008, 2019 an",
+      "price": 329800,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/87751771",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "41"
+    },
+    {
+      "name": "Renault Kadjar, 2020 an",
+      "price": 297000,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/87513086",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "56"
+    },
+
+    {
+      "name": "BMW X1, 2020 an",
+      "price": 373800,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/88038054",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "57"
+    },
+    {
+      "name": "BMW 2 Series, 2015 an",
+      "price": 365980,
+      "currency": "MDL",
+      "km": "87 518 km",
+      "url": "https://999.md/ro/88477536",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "30"
+    },
+
+    {
+      "name": "Mercedes GLE Coupe, 2016 an",
+      "price": 944000,
+      "currency": "MDL",
+      "km": "135 km",
+      "url": "https://999.md/ro/88473766",
+      "updateDate": "Thursday, October 10, 2024 at 03:37 PM",
+      "type": "Vând",
+      "views": "26"
+    },
+    {
+      "name": "Volvo XC90, 2015 an",
+      "price": 458000,
+      "currency": "MDL",
+      "km": "208 000 km",
+      "url": "https://999.md/ro/88269945",
+      "updateDate": "Thursday, October 10, 2024 at 03:36 PM",
+      "type": "Vând",
+      "views": "47"
+    },
+    {
+      "name": "Volvo XC40, 2021 an",
+      "price": 459800,
+      "currency": "MDL",
+      "km": "None",
+      "url": "https://999.md/ro/88033122",
+      "updateDate": "Thursday, October 10, 2024 at 03:36 PM",
+      "type": "Vând",
+      "views": "42"
+    }
+  ]
+}
